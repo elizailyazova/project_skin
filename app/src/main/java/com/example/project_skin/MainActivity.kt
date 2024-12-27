@@ -27,21 +27,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Инициализация tvResult
-        tvResult = findViewById(R.id.tvResult)  // Make sure you have a TextView with this ID in your layout
+        tvResult = findViewById(R.id.tvResult) 
 
-        // Инициализация пула потоков для обработки изображений
         cameraExecutor = Executors.newSingleThreadExecutor()
 
-        // Запрос разрешений на камеру
         if (ContextCompat.checkSelfPermission(
                 this, Manifest.permission.CAMERA
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            // Разрешение уже получено, запускаем камеру
             startCamera()
         } else {
-            // Запрашиваем разрешение на камеру
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.CAMERA),
@@ -49,7 +44,6 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        // Инициализация модели
         classifier = SkinDiseaseClassifier("skin_disease_model.tflite", assets)
     }
 
@@ -62,10 +56,8 @@ class MainActivity : AppCompatActivity() {
 
         if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Разрешение на камеру получено, запускаем камеру
                 startCamera()
             } else {
-                // Разрешение отклонено
                 Log.e("Permission", "Camera permission denied.")
             }
         }
@@ -78,12 +70,10 @@ class MainActivity : AppCompatActivity() {
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
             val previewView = findViewById<PreviewView>(R.id.cameraPreview)
 
-            // Настройка предпросмотра
             val preview = androidx.camera.core.Preview.Builder().build().also {
                 it.setSurfaceProvider(previewView.surfaceProvider)
             }
 
-            // Настройка анализа изображений
             val imageAnalyzer = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
@@ -94,7 +84,6 @@ class MainActivity : AppCompatActivity() {
                 }
 
             try {
-                // Подключение камеры
                 cameraProvider.unbindAll()
                 cameraProvider.bindToLifecycle(this, androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA, preview, imageAnalyzer)
             } catch (exc: Exception) {
@@ -105,18 +94,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun processImage(image: ImageProxy) {
         val bitmap = image.toBitmap()
-        image.close() // Закрытие изображения после обработки
+        image.close()
 
-        // Классификация изображения
         val result = classifier.classifyImage(bitmap)
 
-        // Обновление текста на экране
         runOnUiThread {
             tvResult.text = "Result: $result"
         }
     }
 
-    // Преобразование ImageProxy в Bitmap
     private fun ImageProxy.toBitmap(): Bitmap {
         val yBuffer = planes[0].buffer
         val uBuffer = planes[1].buffer
