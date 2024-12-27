@@ -51,10 +51,10 @@ class SkinDiseaseClassifier(modelPath: String, assetManager: AssetManager) {
         return if (probabilities[maxIndex] < 0.5) "Healthy" else CLASS_NAMES[maxIndex]
     }
     private fun convertBitmapToByteBuffer(bitmap: Bitmap): ByteBuffer {
-        val resizedBitmap = Bitmap.createScaledBitmap(bitmap, 224, 224, true) // Убедитесь, что используется правильный размер
+        val resizedBitmap = Bitmap.createScaledBitmap(bitmap, 224, 224, true) 
         Log.d("SkinClassifier", "Resized bitmap dimensions: ${resizedBitmap.width}x${resizedBitmap.height}")
 
-        val byteBuffer = ByteBuffer.allocateDirect(4 * 224 * 224 * 3) // 4 байта на FLOAT32
+        val byteBuffer = ByteBuffer.allocateDirect(4 * 224 * 224 * 3) 
         byteBuffer.order(ByteOrder.nativeOrder())
 
         val intValues = IntArray(224 * 224)
